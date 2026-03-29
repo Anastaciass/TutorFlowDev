@@ -1,0 +1,56 @@
+name: CD - publish Docker images
+
+on:
+  push:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push backend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/YOUR_GITHUB_USERNAME/tutorflow-backend:latest
+            ghcr.io/YOUR_GITHUB_USERNAME/tutorflow-backend:${{ github.sha }}
+
+  publish-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push frontend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/YOUR_GITHUB_USERNAME/tutorflow-frontend:latest
+            ghcr.io/YOUR_GITHUB_USERNAME/tutorflow-frontend:${{ github.sha }}
