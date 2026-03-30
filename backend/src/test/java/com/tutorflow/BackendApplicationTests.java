@@ -1,9 +1,12 @@
-//package com.tutorflow;
-//
-//import org.junit.jupiter.api.Disabled;
-//import org.springframework.boot.test.context.SpringBootTest;
-//
-//@Disabled("Enable after database is configured")
-//@SpringBootTest
-//class BackendApplicationTests {
-//}
+package com.tutorflow;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class BackendApplicationTests {
+
+    @Test
+    void contextLoads() {
+    }
+}
