@@ -32,8 +32,8 @@ jobs:
           file: ./backend/Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/tutorflow-backend:latest
-            ghcr.io/${{ github.repository_owner }}/tutorflow-backend:${{ github.sha }}
+            ghcr.io/anastaciass/tutorflow-backend:latest
+            ghcr.io/anastaciass/tutorflow-backend:${{ github.sha }}
 
       - name: Build and push frontend image
         uses: docker/build-push-action@v6
@@ -42,5 +42,5 @@ jobs:
           file: ./frontend/Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/tutorflow-frontend:latest
-            ghcr.io/${{ github.repository_owner }}/tutorflow-frontend:${{ github.sha }}
+            ghcr.io/anastaciass/tutorflow-frontend:latest
+            ghcr.io/anastaciass/tutorflow-frontend:${{ github.sha }}
