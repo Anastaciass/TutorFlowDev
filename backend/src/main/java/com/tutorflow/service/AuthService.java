@@ -8,6 +8,7 @@ import com.tutorflow.model.UserRole;
 import com.tutorflow.repository.IUserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import com.tutorflow.exception.AuthException;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -17,10 +18,12 @@ public class AuthService implements IAuthService {
 
     private final IUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
-    public AuthService(IUserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthService(IUserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     @Override
@@ -28,7 +31,7 @@ public class AuthService implements IAuthService {
         User existingUser = userRepository.findByEmail(request.getEmail());
 
         if (existingUser != null) {
-            throw new RuntimeException("User with this email already exists");
+            throw new AuthException("User with this email already exists");
         }
 
         User user = new User();
@@ -56,7 +59,7 @@ public class AuthService implements IAuthService {
         User user = userRepository.findByEmail(request.getEmail());
 
         if (user == null) {
-            throw new RuntimeException("User not found");
+            throw new AuthException("User not found");
         }
 
         Boolean passwordMatches = passwordEncoder.matches(
@@ -65,10 +68,10 @@ public class AuthService implements IAuthService {
         );
 
         if (!passwordMatches) {
-            throw new RuntimeException("Invalid password");
+            throw new AuthException("Invalid password");
         }
 
-        String token = UUID.randomUUID().toString();
+        String token = jwtService.generateToken(user);
 
         return new AuthResponseDTO(
                 token,
