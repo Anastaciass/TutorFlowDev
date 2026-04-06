@@ -1,17 +1,19 @@
 package com.tutorflow.service;
 
-import com.tutorflow.dto.AuthResponseDTO;
 import com.tutorflow.dto.LoginRequestDTO;
+import com.tutorflow.dto.RefreshTokenRequestDTO;
 import com.tutorflow.dto.RegisterRequestDTO;
+import com.tutorflow.dto.TokenResponseDTO;
+import com.tutorflow.exception.AuthException;
+import com.tutorflow.model.RefreshToken;
 import com.tutorflow.model.User;
 import com.tutorflow.model.UserRole;
 import com.tutorflow.repository.IUserRepository;
-import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import com.tutorflow.exception.AuthException;
+import org.springframework.stereotype.Service;
+import com.tutorflow.dto.LogoutRequestDTO;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Service
 public class AuthService implements IAuthService {
@@ -19,15 +21,20 @@ public class AuthService implements IAuthService {
     private final IUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final IRefreshTokenService refreshTokenService;
 
-    public AuthService(IUserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
+    public AuthService(IUserRepository userRepository,
+                       PasswordEncoder passwordEncoder,
+                       JwtService jwtService,
+                       IRefreshTokenService refreshTokenService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.refreshTokenService = refreshTokenService;
     }
 
     @Override
-    public AuthResponseDTO register(RegisterRequestDTO request) {
+    public TokenResponseDTO register(RegisterRequestDTO request) {
         User existingUser = userRepository.findByEmail(request.getEmail());
 
         if (existingUser != null) {
@@ -44,10 +51,12 @@ public class AuthService implements IAuthService {
 
         User savedUser = userRepository.save(user);
 
-        String token = UUID.randomUUID().toString();
+        String accessToken = jwtService.generateAccessToken(savedUser);
+        String refreshToken = refreshTokenService.createRefreshToken(savedUser).getToken();
 
-        return new AuthResponseDTO(
-                token,
+        return new TokenResponseDTO(
+                accessToken,
+                refreshToken,
                 savedUser.getId(),
                 savedUser.getEmail(),
                 savedUser.getRole().name()
@@ -55,7 +64,7 @@ public class AuthService implements IAuthService {
     }
 
     @Override
-    public AuthResponseDTO login(LoginRequestDTO request) {
+    public TokenResponseDTO login(LoginRequestDTO request) {
         User user = userRepository.findByEmail(request.getEmail());
 
         if (user == null) {
@@ -71,13 +80,38 @@ public class AuthService implements IAuthService {
             throw new AuthException("Invalid password");
         }
 
-        String token = jwtService.generateToken(user);
+        String accessToken = jwtService.generateAccessToken(user);
+        String refreshToken = refreshTokenService.createRefreshToken(user).getToken();
 
-        return new AuthResponseDTO(
-                token,
+        return new TokenResponseDTO(
+                accessToken,
+                refreshToken,
                 user.getId(),
                 user.getEmail(),
                 user.getRole().name()
         );
+    }
+
+    @Override
+    public TokenResponseDTO refreshToken(RefreshTokenRequestDTO request) {
+        RefreshToken refreshToken = refreshTokenService.findByToken(request.getRefreshToken());
+        refreshTokenService.verifyExpiration(refreshToken);
+
+        User user = refreshToken.getUser();
+        String accessToken = jwtService.generateAccessToken(user);
+
+        return new TokenResponseDTO(
+                accessToken,
+                refreshToken.getToken(),
+                user.getId(),
+                user.getEmail(),
+                user.getRole().name()
+        );
+    }
+    @Override
+    public void logout(LogoutRequestDTO request) {
+        RefreshToken refreshToken = refreshTokenService.findByToken(request.getRefreshToken());
+        User user = refreshToken.getUser();
+        refreshTokenService.deleteByUser(user);
     }
 }
