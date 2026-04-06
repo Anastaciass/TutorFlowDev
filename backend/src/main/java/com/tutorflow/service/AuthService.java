@@ -94,15 +94,19 @@ public class AuthService implements IAuthService {
 
     @Override
     public TokenResponseDTO refreshToken(RefreshTokenRequestDTO request) {
-        RefreshToken refreshToken = refreshTokenService.findByToken(request.getRefreshToken());
-        refreshTokenService.verifyExpiration(refreshToken);
+        RefreshToken oldRefreshToken = refreshTokenService.findByToken(request.getRefreshToken());
+        refreshTokenService.verifyExpiration(oldRefreshToken);
 
-        User user = refreshToken.getUser();
+        User user = oldRefreshToken.getUser();
+
+        refreshTokenService.deleteByUser(user);
+
+        RefreshToken newRefreshToken = refreshTokenService.createRefreshToken(user);
         String accessToken = jwtService.generateAccessToken(user);
 
         return new TokenResponseDTO(
                 accessToken,
-                refreshToken.getToken(),
+                newRefreshToken.getToken(),
                 user.getId(),
                 user.getEmail(),
                 user.getRole().name()
