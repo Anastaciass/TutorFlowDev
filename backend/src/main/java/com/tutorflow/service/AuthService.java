@@ -1,9 +1,6 @@
 package com.tutorflow.service;
 
-import com.tutorflow.dto.LoginRequestDTO;
-import com.tutorflow.dto.RefreshTokenRequestDTO;
-import com.tutorflow.dto.RegisterRequestDTO;
-import com.tutorflow.dto.TokenResponseDTO;
+import com.tutorflow.dto.*;
 import com.tutorflow.exception.AuthException;
 import com.tutorflow.model.RefreshToken;
 import com.tutorflow.model.User;
@@ -11,8 +8,7 @@ import com.tutorflow.model.UserRole;
 import com.tutorflow.repository.IUserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.tutorflow.dto.LogoutRequestDTO;
-
+import com.tutorflow.dto.MessageResponseDTO;
 import java.time.LocalDateTime;
 
 @Service
@@ -113,9 +109,10 @@ public class AuthService implements IAuthService {
         );
     }
     @Override
-    public void logout(LogoutRequestDTO request) {
+    public MessageResponseDTO logout(LogoutRequestDTO request) {
         RefreshToken refreshToken = refreshTokenService.findByToken(request.getRefreshToken());
         User user = refreshToken.getUser();
         refreshTokenService.deleteByUser(user);
+        return new MessageResponseDTO("Logged out successfully!");
     }
 }

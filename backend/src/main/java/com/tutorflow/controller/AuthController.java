@@ -1,13 +1,10 @@
 package com.tutorflow.controller;
 
-import com.tutorflow.dto.LoginRequestDTO;
-import com.tutorflow.dto.LogoutRequestDTO;
-import com.tutorflow.dto.RefreshTokenRequestDTO;
-import com.tutorflow.dto.RegisterRequestDTO;
-import com.tutorflow.dto.TokenResponseDTO;
+import com.tutorflow.dto.*;
 import com.tutorflow.service.IAuthService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
+import com.tutorflow.dto.MessageResponseDTO;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -36,7 +33,7 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public void logout(@Valid @RequestBody LogoutRequestDTO request) {
-        authService.logout(request);
+    public MessageResponseDTO logout(@Valid @RequestBody LogoutRequestDTO request) {
+        return authService.logout(request);
     }
 }
