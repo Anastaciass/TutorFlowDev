@@ -424,3 +424,60 @@ input {
     font-size: 32px;
   }
 }
+.form-error {
+  margin-top: 16px;
+  color: #dc2626;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.form-success {
+  margin-top: 16px;
+  color: #16a34a;
+  font-size: 14px;
+  font-weight: 500;
+}
+.profile-loading,
+.profile-error-box {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  font-size: 18px;
+  color: #374151;
+}
+
+.profile-error-box p {
+  color: #dc2626;
+  font-weight: 500;
+}
+
+.logout-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.logout-button:hover {
+  background: #1d4ed8;
+}
+
+.profile-details-single {
+  grid-template-columns: 1fr;
+}
+
+.profile-detail-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #4b5563;
+}
