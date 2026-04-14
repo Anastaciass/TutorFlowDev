@@ -69,4 +69,4 @@ export async function logoutUser(refreshToken) {
     }
 
     return data;
-}
+} 
