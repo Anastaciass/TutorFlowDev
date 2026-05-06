@@ -53,6 +53,7 @@ sonar {
         property "sonar.projectKey", "Anastaciass_TutorFlowDev"
         property "sonar.organization", "anastaciass"
         property "sonar.host.url", "https://sonarcloud.io"
+        property "sonar.coverage.exclusions", "**/config/**,**/controller/**,**/dto/**,**/model/**,**/repository/**,**/exception/**,**/*Application.java"
     }
 }
 jacocoTestReport {
