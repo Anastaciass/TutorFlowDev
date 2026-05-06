@@ -8,7 +8,6 @@ import com.tutorflow.dto.MessageResponseDTO;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "*")
 public class AuthController {
 
     private final IAuthService authService;
