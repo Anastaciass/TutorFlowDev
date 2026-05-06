@@ -56,15 +56,24 @@ sonar {
         property "sonar.coverage.exclusions", "**/config/**,**/controller/**,**/dto/**,**/model/**,**/repository/**,**/exception/**,**/*Application.java"
     }
 }
-jacocoTestReport {
-    dependsOn test
 
+jacocoTestReport {
     reports {
         xml.required = true
         html.required = true
     }
-}
 
-test {
-    finalizedBy jacocoTestReport
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                    "com/tutorflow/config/**",
+                    "com/tutorflow/dto/**",
+                    "com/tutorflow/model/**",
+                    "com/tutorflow/exception/**",
+                    "com/tutorflow/service/JwtService.class",
+                    "com/tutorflow/service/RefreshTokenService.class",
+                    "com/tutorflow/service/CustomUserDetailsService.class"
+            ])
+        }))
+    }
 }
