@@ -5,7 +5,7 @@ TutorFlow is a tutoring booking web application designed to simplify lesson sche
 ## Tech Stack
 - Frontend: React
 - Backend: Java
-- Database: in process...
+- Database: Postgres
 
 ## Status
 Initial project setup
