@@ -15,7 +15,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.tutorflow.exception.AuthException;
 import com.tutorflow.dto.LoginRequestDTO;
-import com.tutorflow.exception.AuthException;
 
 import java.time.LocalDateTime;
 

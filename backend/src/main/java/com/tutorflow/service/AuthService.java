@@ -67,7 +67,7 @@ public class AuthService implements IAuthService {
             throw new AuthException("User not found");
         }
 
-        Boolean passwordMatches = passwordEncoder.matches(
+        boolean passwordMatches = passwordEncoder.matches(
                 request.getPassword(),
                 user.getPasswordHash()
         );
