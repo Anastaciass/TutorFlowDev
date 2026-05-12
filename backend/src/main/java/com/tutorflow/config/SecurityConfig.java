@@ -39,6 +39,8 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/health").permitAll()
                         .requestMatchers("/api/users/me").authenticated()
                         .requestMatchers("/api/test/common").authenticated()
+                        .requestMatchers("/api/tutor/slots").hasRole("TUTOR")
+                        .requestMatchers("/api/student/slots").hasRole("STUDENT")
                         .requestMatchers("/api/test/student").hasRole("STUDENT")
                         .requestMatchers("/api/test/tutor").hasRole("TUTOR")
                         .anyRequest().authenticated()
