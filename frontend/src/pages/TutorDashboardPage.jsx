@@ -1,6 +1,17 @@
-import { useState } from 'react';
-import { GraduationCap, Plus, X, User, Calendar, Clock, CheckCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import {
+    GraduationCap,
+    Plus,
+    X,
+    User,
+    Calendar,
+    Clock,
+    CheckCircle,
+    Menu,
+    CircleUserRound
+} from 'lucide-react';
 import { createLessonSlot } from '../services/lessonSlotService';
+import { getCurrentUser } from '../services/authService';
 
 function TutorDashboardPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -10,6 +21,9 @@ function TutorDashboardPage() {
     const [endTime, setEndTime] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
+    const [user, setUser] = useState(null);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
 
     const handleCreateSlot = async (event) => {
         event.preventDefault();
@@ -37,6 +51,21 @@ function TutorDashboardPage() {
             setErrorMessage(error.message);
         }
     };
+    useEffect(() => {
+        const loadUser = async () => {
+            try {
+                const token = localStorage.getItem('accessToken');
+
+                const userData = await getCurrentUser(token);
+
+                setUser(userData);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        loadUser();
+    }, []);
 
     return (
         <div className="dashboard-page">
@@ -46,17 +75,16 @@ function TutorDashboardPage() {
                     <span>TutorFlow</span>
                 </div>
 
-                <nav className="dashboard-nav">
-                    <span>Tutor Dashboard</span>
-                    <button className="dashboard-logout">Log Out</button>
-                </nav>
+                <button className="hamburger-button" onClick={() => setIsMenuOpen(true)}>
+                    <Menu size={28} />
+                </button>
             </header>
 
             <main className="dashboard-content">
                 <section className="dashboard-header-row">
                     <div>
                         <h1>Tutor Dashboard</h1>
-                        <p>Welcome back, Dr. Sarah Johnson</p>
+                        <p>Welcome back, {user?.fullName}</p>
                     </div>
 
                     <button className="primary-action-button" onClick={() => setIsModalOpen(true)}>
@@ -178,6 +206,44 @@ function TutorDashboardPage() {
                             </div>
                         </div>
                     </form>
+                </div>
+            )}
+
+            {isMenuOpen && (
+                <div className="side-menu-overlay">
+                    <aside className="side-menu">
+                        <div className="side-menu-header">
+                            <div className="logo logo-with-icon">
+                                <GraduationCap size={40} className="brand-icon" />
+                                <span>TutorFlow</span>
+                            </div>
+
+                            <button className="side-menu-close" onClick={() => setIsMenuOpen(false)}>
+                                <X size={36} />
+                            </button>
+                        </div>
+
+                        <nav className="side-menu-links">
+                            <button>
+                                <GraduationCap size={34} />
+                                Tutor Dashboard
+                            </button>
+
+                            <button>
+                                <CircleUserRound size={34} />
+                                Profile
+                            </button>
+
+                            <button>
+                                <Calendar size={34} />
+                                Calendar
+                            </button>
+                        </nav>
+
+                        <button className="side-menu-logout">
+                            Log Out
+                        </button>
+                    </aside>
                 </div>
             )}
         </div>
