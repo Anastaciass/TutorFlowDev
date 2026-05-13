@@ -11,9 +11,11 @@ import {
     CircleUserRound
 } from 'lucide-react';
 import { createLessonSlot } from '../services/lessonSlotService';
-import { getCurrentUser } from '../services/authService';
+import { getCurrentUser, logoutUser } from '../services/authService';
+import { useNavigate } from 'react-router-dom';
 
 function TutorDashboardPage() {
+    const navigate = useNavigate();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [subject, setSubject] = useState('');
     const [date, setDate] = useState('');
@@ -66,7 +68,22 @@ function TutorDashboardPage() {
 
         loadUser();
     }, []);
+    const handleLogout = async () => {
+        const refreshToken = localStorage.getItem('refreshToken');
 
+        try {
+            if (refreshToken) {
+                await logoutUser(refreshToken);
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+
+            navigate('/login');
+        }
+    };
     return (
         <div className="dashboard-page">
             <header className="dashboard-topbar">
@@ -224,12 +241,17 @@ function TutorDashboardPage() {
                         </div>
 
                         <nav className="side-menu-links">
-                            <button>
+                            <button onClick={() => setIsMenuOpen(false)}>
                                 <GraduationCap size={34} />
                                 Tutor Dashboard
                             </button>
 
-                            <button>
+                            <button
+                                onClick={() => {
+                                    setIsMenuOpen(false);
+                                    navigate('/profile');
+                                }}
+                            >
                                 <CircleUserRound size={34} />
                                 Profile
                             </button>
@@ -240,7 +262,7 @@ function TutorDashboardPage() {
                             </button>
                         </nav>
 
-                        <button className="side-menu-logout">
+                        <button className="side-menu-logout" onClick={handleLogout}>
                             Log Out
                         </button>
                     </aside>
