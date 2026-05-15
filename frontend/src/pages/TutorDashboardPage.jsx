@@ -110,6 +110,12 @@ function TutorDashboardPage() {
             year: 'numeric',
         });
     };
+    const isUpcomingSlot = (slot) => {
+        const slotDateTime = new Date(`${slot.date}T${slot.startTime}`);
+        const now = new Date();
+
+        return slotDateTime >= now;
+    };
     return (
         <div className="dashboard-page">
             <header className="dashboard-topbar">
@@ -208,7 +214,15 @@ function TutorDashboardPage() {
                         {slots.length === 0 ? (
                             <p className="empty-state">No upcoming lesson slots yet.</p>
                         ) : (
-                            slots.map((slot) => (
+                            [...slots]
+                                .filter(isUpcomingSlot)
+                                .sort((a, b) => {
+                                    const dateTimeA = new Date(`${a.date}T${a.startTime}`);
+                                    const dateTimeB = new Date(`${b.date}T${b.startTime}`);
+
+                                    return dateTimeA - dateTimeB;
+                                })
+                                .map((slot) => (
                                 <div className="booking-card" key={slot.id}>
                                     <h3>{slot.subject}</h3>
 
