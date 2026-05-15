@@ -10,7 +10,7 @@ import {
     Menu,
     CircleUserRound
 } from 'lucide-react';
-import { createLessonSlot } from '../services/lessonSlotService';
+import { createLessonSlot, getTutorSlots } from '../services/LessonSlotService';
 import { getCurrentUser, logoutUser } from '../services/authService';
 import { useNavigate } from 'react-router-dom';
 
@@ -25,6 +25,8 @@ function TutorDashboardPage() {
     const [successMessage, setSuccessMessage] = useState('');
     const [user, setUser] = useState(null);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [slots, setSlots] = useState([]);
+    const [activeTab, setActiveTab] = useState('booking');
 
 
     const handleCreateSlot = async (event) => {
@@ -36,12 +38,14 @@ function TutorDashboardPage() {
         try {
             const accessToken = localStorage.getItem('accessToken');
 
-            await createLessonSlot(accessToken, {
+            const createdSlot = await createLessonSlot(accessToken, {
                 subject,
                 date,
                 startTime,
                 endTime,
             });
+
+            setSlots((previousSlots) => [...previousSlots, createdSlot]);
 
             setSuccessMessage('Time slot created successfully.');
             setSubject('');
@@ -59,8 +63,11 @@ function TutorDashboardPage() {
                 const token = localStorage.getItem('accessToken');
 
                 const userData = await getCurrentUser(token);
-
                 setUser(userData);
+
+                const tutorSlots = await getTutorSlots(token);
+                setSlots(tutorSlots);
+
             } catch (error) {
                 console.error(error);
             }
@@ -83,6 +90,25 @@ function TutorDashboardPage() {
 
             navigate('/login');
         }
+    };
+    const formatTime = (time) => {
+        if (!time) {
+            return '';
+        }
+
+        return time.slice(0, 5);
+    };
+    const formatDate = (date) => {
+        if (!date) {
+            return '';
+        }
+
+        return new Date(date).toLocaleDateString('en-US', {
+            weekday: 'long',
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric',
+        });
     };
     return (
         <div className="dashboard-page">
@@ -131,32 +157,80 @@ function TutorDashboardPage() {
                 </section>
 
                 <section className="dashboard-tabs">
-                    <button className="active-tab">Booking Requests <span>1</span></button>
-                    <button>Upcoming Lessons</button>
-                    <button>Past Lessons</button>
+                    <button
+                        className={activeTab === 'booking' ? 'active-tab' : ''}
+                        onClick={() => setActiveTab('booking')}
+                    >
+                        Booking Requests <span>1</span>
+                    </button>
+
+                    <button
+                        className={activeTab === 'upcoming' ? 'active-tab' : ''}
+                        onClick={() => setActiveTab('upcoming')}
+                    >
+                        Upcoming Lessons
+                    </button>
+
+                    <button
+                        className={activeTab === 'past' ? 'active-tab' : ''}
+                        onClick={() => setActiveTab('past')}
+                    >
+                        Past Lessons
+                    </button>
                 </section>
 
-                <section className="booking-card">
-                    <h3>Mathematics</h3>
-                    <span className="pending-pill">Pending Approval</span>
+                {activeTab === 'booking' && (
+                    <section className="booking-card">
+                        <h3>Mathematics</h3>
+                        <span className="pending-pill">Pending Approval</span>
 
-                    <div className="booking-info">
-                        <p><User size={18} /> Student: Alex Chen</p>
-                        <p><Calendar size={18} /> Sunday, February 15, 2026</p>
-                        <p><Clock size={18} /> 14:00 - 15:00</p>
-                    </div>
+                        <div className="booking-info">
+                            <p><User size={18} /> Student: Alex Chen</p>
+                            <p><Calendar size={18} /> Sunday, February 15, 2026</p>
+                            <p><Clock size={18} /> 14:00 - 15:00</p>
+                        </div>
 
-                    <div className="booking-actions">
-                        <button className="confirm-button">
-                            <CheckCircle size={18} />
-                            Confirm
-                        </button>
-                        <button className="decline-button">
-                            <X size={18} />
-                            Decline
-                        </button>
-                    </div>
-                </section>
+                        <div className="booking-actions">
+                            <button className="confirm-button">
+                                <CheckCircle size={18} />
+                                Confirm
+                            </button>
+                            <button className="decline-button">
+                                <X size={18} />
+                                Decline
+                            </button>
+                        </div>
+                    </section>
+                )}
+
+                {activeTab === 'upcoming' && (
+                    <section className="slot-list">
+                        {slots.length === 0 ? (
+                            <p className="empty-state">No upcoming lesson slots yet.</p>
+                        ) : (
+                            slots.map((slot) => (
+                                <div className="booking-card" key={slot.id}>
+                                    <h3>{slot.subject}</h3>
+
+                                    <span className={slot.status === 'AVAILABLE' ? 'available-pill' : 'pending-pill'}>
+                        {slot.status === 'AVAILABLE' ? 'Available' : slot.status}
+                    </span>
+
+                                    <div className="booking-info">
+                                        <p><Calendar size={18} /> {formatDate(slot.date)}</p>
+                                        <p><Clock size={18} /> {formatTime(slot.startTime)} - {formatTime(slot.endTime)}</p>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </section>
+                )}
+
+                {activeTab === 'past' && (
+                    <section className="slot-list">
+                        <p className="empty-state">No past lessons yet.</p>
+                    </section>
+                )}
             </main>
 
             {isModalOpen && (

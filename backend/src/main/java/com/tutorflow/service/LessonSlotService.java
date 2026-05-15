@@ -61,6 +61,15 @@ public class LessonSlotService {
                 .map(this::mapToDTO)
                 .toList();
     }
+    public List<LessonSlotResponseDTO> getTutorSlots(String tutorEmail) {
+        User tutor = userRepository.findByEmail(tutorEmail);
+
+        List<LessonSlot> slots = lessonSlotRepository.findByTutor(tutor);
+
+        return slots.stream()
+                .map(this::mapToDTO)
+                .toList();
+    }
 
     private LessonSlotResponseDTO mapToDTO(LessonSlot slot) {
 

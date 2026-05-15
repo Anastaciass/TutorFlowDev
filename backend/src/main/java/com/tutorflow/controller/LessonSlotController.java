@@ -27,6 +27,11 @@ public class LessonSlotController {
         String tutorEmail = authentication.getName();
         return lessonSlotService.createSlot(request, tutorEmail);
     }
+    @GetMapping("/tutor/slots")
+    public List<LessonSlotResponseDTO> getTutorSlots(Authentication authentication) {
+        String tutorEmail = authentication.getName();
+        return lessonSlotService.getTutorSlots(tutorEmail);
+    }
 
     @GetMapping("/student/slots")
     public List<LessonSlotResponseDTO> getAvailableSlots() {
