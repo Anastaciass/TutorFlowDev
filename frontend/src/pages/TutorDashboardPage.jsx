@@ -116,6 +116,14 @@ function TutorDashboardPage() {
 
         return slotDateTime >= now;
     };
+    const upcomingSlots = slots
+        .filter(isUpcomingSlot)
+        .sort((a, b) => {
+            const dateTimeA = new Date(`${a.date}T${a.startTime}`);
+            const dateTimeB = new Date(`${b.date}T${b.startTime}`);
+
+            return dateTimeA - dateTimeB;
+        });
     return (
         <div className="dashboard-page">
             <header className="dashboard-topbar">
@@ -153,7 +161,7 @@ function TutorDashboardPage() {
 
                     <div className="stat-card">
                         <p>Upcoming Lessons</p>
-                        <strong className="stat-blue">2</strong>
+                        <strong className="stat-blue">{upcomingSlots.length}</strong>
                     </div>
 
                     <div className="stat-card">
@@ -214,15 +222,7 @@ function TutorDashboardPage() {
                         {slots.length === 0 ? (
                             <p className="empty-state">No upcoming lesson slots yet.</p>
                         ) : (
-                            [...slots]
-                                .filter(isUpcomingSlot)
-                                .sort((a, b) => {
-                                    const dateTimeA = new Date(`${a.date}T${a.startTime}`);
-                                    const dateTimeB = new Date(`${b.date}T${b.startTime}`);
-
-                                    return dateTimeA - dateTimeB;
-                                })
-                                .map((slot) => (
+                            upcomingSlots.map((slot) => (
                                 <div className="booking-card" key={slot.id}>
                                     <h3>{slot.subject}</h3>
 

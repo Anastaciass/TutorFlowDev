@@ -48,7 +48,11 @@ function RegisterPage() {
             localStorage.setItem('refreshToken', data.refreshToken);
 
             setSuccessMessage('Account created successfully!');
-            navigate('/profile');
+            if (data.role === 'TUTOR') {
+                navigate('/tutor-dashboard');
+            } else {
+                navigate('/student-dashboard');
+            }
         } catch (error) {
             setErrorMessage(error.message);
         } finally {

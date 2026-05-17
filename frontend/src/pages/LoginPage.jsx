@@ -23,12 +23,15 @@ function LoginPage() {
                 password,
             });
 
-            // сохраняем токены
+
             localStorage.setItem('accessToken', data.accessToken);
             localStorage.setItem('refreshToken', data.refreshToken);
 
-            // идём в профиль
-            navigate('/profile');
+            if (data.role === 'TUTOR') {
+                navigate('/tutor-dashboard');
+            } else {
+                navigate('/student-dashboard');
+            }
         } catch (error) {
             setErrorMessage(error.message);
         } finally {
