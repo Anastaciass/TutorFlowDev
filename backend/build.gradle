@@ -54,7 +54,15 @@ sonar {
         property "sonar.organization", "anastaciass"
         property "sonar.host.url", "https://sonarcloud.io"
         property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml"
-        property "sonar.coverage.exclusions", "**/config/**,**/controller/**,**/dto/**,**/model/**,**/repository/**,**/exception/**,**/service/**,**/*Application.java"
+
+        property "sonar.coverage.exclusions",
+                "**/config/**," +
+                        "**/controller/**," +
+                        "**/dto/**," +
+                        "**/model/**," +
+                        "**/repository/**," +
+                        "**/exception/**," +
+                        "**/*Application.java"
     }
 }
 
