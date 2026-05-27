@@ -37,4 +37,13 @@ public class LessonSlotController {
     public List<LessonSlotResponseDTO> getAvailableSlots() {
         return lessonSlotService.getAvailableSlots();
     }
+
+    @PostMapping("/student/slots/{slotId}/book")
+    public LessonSlotResponseDTO bookSlot(
+            @PathVariable Integer slotId,
+            Authentication authentication
+    ) {
+        String studentEmail = authentication.getName();
+        return lessonSlotService.bookSlot(slotId, studentEmail);
+    }
 }

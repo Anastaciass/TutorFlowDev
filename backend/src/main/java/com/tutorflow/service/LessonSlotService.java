@@ -71,6 +71,24 @@ public class LessonSlotService {
                 .toList();
     }
 
+    public LessonSlotResponseDTO bookSlot(Integer slotId, String studentEmail) {
+        LessonSlot slot = lessonSlotRepository.findById(slotId)
+                .orElseThrow(() -> new RuntimeException("Lesson slot not found"));
+
+        if (slot.getStatus() != LessonSlotStatus.AVAILABLE) {
+            throw new RuntimeException("Lesson slot is not available");
+        }
+
+        User student = userRepository.findByEmail(studentEmail);
+
+        slot.setStudent(student);
+        slot.setStatus(LessonSlotStatus.PENDING);
+
+        LessonSlot savedSlot = lessonSlotRepository.save(slot);
+
+        return mapToDTO(savedSlot);
+    }
+
     private LessonSlotResponseDTO mapToDTO(LessonSlot slot) {
 
         return new LessonSlotResponseDTO(

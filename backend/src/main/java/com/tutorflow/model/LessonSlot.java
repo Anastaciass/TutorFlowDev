@@ -28,6 +28,10 @@ public class LessonSlot {
     @JoinColumn(name = "tutor_id", nullable = false)
     private User tutor;
 
+    @ManyToOne
+    @JoinColumn(name = "student_id")
+    private User student;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
@@ -105,5 +109,13 @@ public class LessonSlot {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public User getStudent() {
+        return student;
+    }
+
+    public void setStudent(User student) {
+        this.student = student;
     }
 }
