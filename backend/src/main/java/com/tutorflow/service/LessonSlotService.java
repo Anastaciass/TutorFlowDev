@@ -88,6 +88,44 @@ public class LessonSlotService {
 
         return mapToDTO(savedSlot);
     }
+    public LessonSlotResponseDTO confirmBooking(Integer slotId, String tutorEmail) {
+        LessonSlot slot = lessonSlotRepository.findById(slotId)
+                .orElseThrow(() -> new RuntimeException("Lesson slot not found"));
+
+        if (!slot.getTutor().getEmail().equals(tutorEmail)) {
+            throw new RuntimeException("You are not allowed to confirm this booking");
+        }
+
+        if (slot.getStatus() != LessonSlotStatus.PENDING) {
+            throw new RuntimeException("Lesson slot is not pending");
+        }
+
+        slot.setStatus(LessonSlotStatus.CONFIRMED);
+
+        LessonSlot savedSlot = lessonSlotRepository.save(slot);
+
+        return mapToDTO(savedSlot);
+    }
+
+    public LessonSlotResponseDTO declineBooking(Integer slotId, String tutorEmail) {
+        LessonSlot slot = lessonSlotRepository.findById(slotId)
+                .orElseThrow(() -> new RuntimeException("Lesson slot not found"));
+
+        if (!slot.getTutor().getEmail().equals(tutorEmail)) {
+            throw new RuntimeException("You are not allowed to decline this booking");
+        }
+
+        if (slot.getStatus() != LessonSlotStatus.PENDING) {
+            throw new RuntimeException("Lesson slot is not pending");
+        }
+
+        slot.setStudent(null);
+        slot.setStatus(LessonSlotStatus.AVAILABLE);
+
+        LessonSlot savedSlot = lessonSlotRepository.save(slot);
+
+        return mapToDTO(savedSlot);
+    }
 
     private LessonSlotResponseDTO mapToDTO(LessonSlot slot) {
 
