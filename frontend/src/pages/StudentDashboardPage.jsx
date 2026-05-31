@@ -2,7 +2,10 @@ import { useEffect, useState } from 'react';
 import { GraduationCap, Calendar, Clock, BookOpen, Menu, X, CircleUserRound } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { getCurrentUser, logoutUser } from '../services/authService';
-import { getAvailableSlots } from '../services/LessonSlotService';
+import {
+    getAvailableSlots,
+    bookLessonSlot
+} from '../services/LessonSlotService.js';
 
 function StudentDashboardPage() {
     const navigate = useNavigate();
@@ -72,6 +75,27 @@ function StudentDashboardPage() {
         const now = new Date();
 
         return slotDateTime >= now;
+    };
+    const refreshAvailableSlots = async () => {
+        const token = localStorage.getItem('accessToken');
+
+        try {
+            const availableSlots = await getAvailableSlots(token);
+            setSlots(availableSlots);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleBookSlot = async (slotId) => {
+        const token = localStorage.getItem('accessToken');
+
+        try {
+            await bookLessonSlot(token, slotId);
+            await refreshAvailableSlots();
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     return (
@@ -155,7 +179,10 @@ function StudentDashboardPage() {
                                         </p>
                                     </div>
 
-                                    <button className="book-slot-button">
+                                    <button
+                                        className="book-slot-button"
+                                        onClick={() => handleBookSlot(slot.id)}
+                                    >
                                         <BookOpen size={18} />
                                         Book This Slot
                                     </button>

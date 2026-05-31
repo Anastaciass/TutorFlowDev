@@ -140,4 +140,5 @@ public class LessonSlotService {
                 slot.getTutor().getFullName()
         );
     }
+
 }

@@ -10,7 +10,12 @@ import {
     Menu,
     CircleUserRound
 } from 'lucide-react';
-import { createLessonSlot, getTutorSlots } from '../services/LessonSlotService';
+import {
+    createLessonSlot,
+    getTutorSlots,
+    confirmLessonSlot,
+    declineLessonSlot
+} from '../services/LessonSlotService.js';
 import { getCurrentUser, logoutUser } from '../services/authService';
 import { useNavigate } from 'react-router-dom';
 
@@ -26,6 +31,16 @@ function TutorDashboardPage() {
     const [user, setUser] = useState(null);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [slots, setSlots] = useState([]);
+    const refreshSlots = async () => {
+        const token = localStorage.getItem('accessToken');
+
+        try {
+            const data = await getTutorSlots(token);
+            setSlots(data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
     const [activeTab, setActiveTab] = useState('booking');
 
 
@@ -124,6 +139,27 @@ function TutorDashboardPage() {
 
             return dateTimeA - dateTimeB;
         });
+    const handleConfirm = async (slotId) => {
+        const token = localStorage.getItem('accessToken');
+
+        try {
+            await confirmLessonSlot(token, slotId);
+            await refreshSlots();
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleDecline = async (slotId) => {
+        const token = localStorage.getItem('accessToken');
+
+        try {
+            await declineLessonSlot(token, slotId);
+            await refreshSlots();
+        } catch (error) {
+            console.error(error);
+        }
+    };
     return (
         <div className="dashboard-page">
             <header className="dashboard-topbar">
@@ -194,26 +230,42 @@ function TutorDashboardPage() {
                 </section>
 
                 {activeTab === 'booking' && (
-                    <section className="booking-card">
-                        <h3>Mathematics</h3>
-                        <span className="pending-pill">Pending Approval</span>
+                    <section className="slot-list">
+                        {slots.filter((slot) => slot.status === 'PENDING').length === 0 ? (
+                            <p className="empty-state">No booking requests yet.</p>
+                        ) : (
+                            slots
+                                .filter((slot) => slot.status === 'PENDING')
+                                .map((slot) => (
+                                    <div className="booking-card" key={slot.id}>
+                                        <h3>{slot.subject}</h3>
+                                        <span className="pending-pill">Pending Approval</span>
 
-                        <div className="booking-info">
-                            <p><User size={18} /> Student: Alex Chen</p>
-                            <p><Calendar size={18} /> Sunday, February 15, 2026</p>
-                            <p><Clock size={18} /> 14:00 - 15:00</p>
-                        </div>
+                                        <div className="booking-info">
+                                            <p><Calendar size={18} /> {formatDate(slot.date)}</p>
+                                            <p><Clock size={18} /> {formatTime(slot.startTime)} - {formatTime(slot.endTime)}</p>
+                                        </div>
 
-                        <div className="booking-actions">
-                            <button className="confirm-button">
-                                <CheckCircle size={18} />
-                                Confirm
-                            </button>
-                            <button className="decline-button">
-                                <X size={18} />
-                                Decline
-                            </button>
-                        </div>
+                                        <div className="booking-actions">
+                                            <button
+                                                className="confirm-button"
+                                                onClick={() => handleConfirm(slot.id)}
+                                            >
+                                                <CheckCircle size={18} />
+                                                Confirm
+                                            </button>
+
+                                            <button
+                                                className="decline-button"
+                                                onClick={() => handleDecline(slot.id)}
+                                            >
+                                                <X size={18} />
+                                                Decline
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))
+                        )}
                     </section>
                 )}
 
