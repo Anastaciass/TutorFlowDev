@@ -30,6 +30,9 @@ function TutorDashboardPage() {
     const [successMessage, setSuccessMessage] = useState('');
     const [user, setUser] = useState(null);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [visibleRequests, setVisibleRequests] = useState(3);
+    const [visibleUpcomingLessons, setVisibleUpcomingLessons] = useState(3);
+    const [visiblePastLessons, setVisiblePastLessons] = useState(3);
     const [slots, setSlots] = useState([]);
     const refreshSlots = async () => {
         const token = localStorage.getItem('accessToken');
@@ -49,6 +52,18 @@ function TutorDashboardPage() {
 
         setErrorMessage('');
         setSuccessMessage('');
+        const slotStartDateTime = new Date(`${date}T${startTime}`);
+        const now = new Date();
+
+        if (slotStartDateTime < now) {
+            setErrorMessage('Lesson slot cannot be created in the past.');
+            return;
+        }
+
+        if (endTime <= startTime) {
+            setErrorMessage('End time must be after start time.');
+            return;
+        }
 
         try {
             const accessToken = localStorage.getItem('accessToken');
@@ -131,13 +146,26 @@ function TutorDashboardPage() {
 
         return slotDateTime >= now;
     };
+    const pendingRequests = slots.filter((slot) => slot.status === 'PENDING');
+
     const upcomingSlots = slots
+        .filter((slot) => slot.status === 'AVAILABLE' || slot.status === 'CONFIRMED')
         .filter(isUpcomingSlot)
         .sort((a, b) => {
             const dateTimeA = new Date(`${a.date}T${a.startTime}`);
             const dateTimeB = new Date(`${b.date}T${b.startTime}`);
 
             return dateTimeA - dateTimeB;
+        });
+
+    const pastLessons = slots
+        .filter((slot) => slot.status === 'CONFIRMED')
+        .filter((slot) => !isUpcomingSlot(slot))
+        .sort((a, b) => {
+            const dateTimeA = new Date(`${a.date}T${a.startTime}`);
+            const dateTimeB = new Date(`${b.date}T${b.startTime}`);
+
+            return dateTimeB - dateTimeA;
         });
     const handleConfirm = async (slotId) => {
         const token = localStorage.getItem('accessToken');
@@ -192,7 +220,7 @@ function TutorDashboardPage() {
                 <section className="stats-grid">
                     <div className="stat-card">
                         <p>Pending Requests</p>
-                        <strong className="stat-orange">1</strong>
+                        <strong className="stat-orange">{pendingRequests.length}</strong>
                     </div>
 
                     <div className="stat-card">
@@ -202,7 +230,7 @@ function TutorDashboardPage() {
 
                     <div className="stat-card">
                         <p>Completed Lessons</p>
-                        <strong className="stat-green">1</strong>
+                        <strong className="stat-green">{pastLessons.length}</strong>
                     </div>
                 </section>
 
@@ -211,21 +239,21 @@ function TutorDashboardPage() {
                         className={activeTab === 'booking' ? 'active-tab' : ''}
                         onClick={() => setActiveTab('booking')}
                     >
-                        Booking Requests <span>1</span>
+                        Booking Requests <span>{pendingRequests.length}</span>
                     </button>
 
                     <button
                         className={activeTab === 'upcoming' ? 'active-tab' : ''}
                         onClick={() => setActiveTab('upcoming')}
                     >
-                        Upcoming Lessons
+                        Upcoming Lessons <span>{upcomingSlots.length}</span>
                     </button>
 
                     <button
                         className={activeTab === 'past' ? 'active-tab' : ''}
                         onClick={() => setActiveTab('past')}
                     >
-                        Past Lessons
+                        Past Lessons <span>{pastLessons.length}</span>
                     </button>
                 </section>
 
@@ -234,9 +262,7 @@ function TutorDashboardPage() {
                         {slots.filter((slot) => slot.status === 'PENDING').length === 0 ? (
                             <p className="empty-state">No booking requests yet.</p>
                         ) : (
-                            slots
-                                .filter((slot) => slot.status === 'PENDING')
-                                .map((slot) => (
+                            pendingRequests.slice(0, visibleRequests).map((slot) => (
                                     <div className="booking-card" key={slot.id}>
                                         <h3>{slot.subject}</h3>
                                         <span className="pending-pill">Pending Approval</span>
@@ -267,6 +293,15 @@ function TutorDashboardPage() {
                                 ))
                         )}
                     </section>
+
+                )}
+                {visibleRequests < pendingRequests.length && (
+                    <button
+                        className="load-more-button"
+                        onClick={() => setVisibleRequests(visibleRequests + 3)}
+                    >
+                        Load More
+                    </button>
                 )}
 
                 {activeTab === 'upcoming' && (
@@ -274,7 +309,7 @@ function TutorDashboardPage() {
                         {slots.length === 0 ? (
                             <p className="empty-state">No upcoming lesson slots yet.</p>
                         ) : (
-                            upcomingSlots.map((slot) => (
+                            upcomingSlots.slice(0, visibleUpcomingLessons).map((slot) => (
                                 <div className="booking-card" key={slot.id}>
                                     <h3>{slot.subject}</h3>
 
@@ -291,11 +326,42 @@ function TutorDashboardPage() {
                         )}
                     </section>
                 )}
+                {visibleUpcomingLessons < upcomingSlots.length && (
+                    <button
+                        className="load-more-button"
+                        onClick={() => setVisibleUpcomingLessons(visibleUpcomingLessons + 3)}
+                    >
+                        Load More
+                    </button>
+                )}
 
                 {activeTab === 'past' && (
                     <section className="slot-list">
-                        <p className="empty-state">No past lessons yet.</p>
+                        {pastLessons.length === 0 ? (
+                            <p className="empty-state">No past lessons yet.</p>
+                        ) : (
+                            pastLessons.slice(0, visiblePastLessons).map((slot) => (
+                                <div className="booking-card" key={slot.id}>
+                                    <h3>{slot.subject}</h3>
+
+                                    <span className="past-pill">Completed</span>
+
+                                    <div className="booking-info">
+                                        <p><Calendar size={18} /> {formatDate(slot.date)}</p>
+                                        <p><Clock size={18} /> {formatTime(slot.startTime)} - {formatTime(slot.endTime)}</p>
+                                    </div>
+                                </div>
+                            ))
+                        )}
                     </section>
+                )}
+                {visiblePastLessons < pastLessons.length && (
+                    <button
+                        className="load-more-button"
+                        onClick={() => setVisiblePastLessons(visiblePastLessons + 3)}
+                    >
+                        Load More
+                    </button>
                 )}
             </main>
 

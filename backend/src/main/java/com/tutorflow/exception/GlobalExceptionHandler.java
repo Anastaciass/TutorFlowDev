@@ -42,6 +42,18 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponseDTO> handleBadRequestException(BadRequestException ex) {
+
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(
+                LocalDateTime.now().toString(),
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                ex.getMessage()
+        );
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDTO> handleGenericException(Exception ex) {

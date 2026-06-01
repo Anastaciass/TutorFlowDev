@@ -13,6 +13,9 @@ function StudentDashboardPage() {
 
     const [user, setUser] = useState(null);
     const [slots, setSlots] = useState([]);
+    const [visibleAvailableSlots, setVisibleAvailableSlots] = useState(3);
+    const [visibleMyLessons, setVisibleMyLessons] = useState(3);
+    const [visiblePastLessons, setVisiblePastLessons] = useState(3);
     const [bookings, setBookings] = useState([]);
     const [activeTab, setActiveTab] = useState('available');
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -114,6 +117,7 @@ function StudentDashboardPage() {
         });
 
     const pastBookings = bookings
+        .filter((booking) => booking.status === 'CONFIRMED')
         .filter((booking) => !isUpcomingSlot(booking))
         .sort((a, b) => {
             const dateTimeA = new Date(`${a.date}T${a.startTime}`);
@@ -153,12 +157,12 @@ function StudentDashboardPage() {
 
                     <div className="stat-card">
                         <p>Upcoming Lessons</p>
-                        <strong className="stat-green">0</strong>
+                        <strong className="stat-green">{upcomingBookings.length}</strong>
                     </div>
 
                     <div className="stat-card">
                         <p>Completed Lessons</p>
-                        <strong className="stat-orange">0</strong>
+                        <strong className="stat-orange">{pastBookings.length}</strong>
                     </div>
                 </section>
 
@@ -190,45 +194,57 @@ function StudentDashboardPage() {
                         {slots.filter(isUpcomingSlot).length === 0 ? (
                             <p className="empty-state">No available lesson slots yet.</p>
                         ) : (
-                            [...slots]
-                                .filter(isUpcomingSlot)
-                                .sort((a, b) => {
-                                    const dateTimeA = new Date(`${a.date}T${a.startTime}`);
-                                    const dateTimeB = new Date(`${b.date}T${b.startTime}`);
+                            <>
+                                {[...slots]
+                                    .filter(isUpcomingSlot)
+                                    .sort((a, b) => {
+                                        const dateTimeA = new Date(`${a.date}T${a.startTime}`);
+                                        const dateTimeB = new Date(`${b.date}T${b.startTime}`);
 
-                                    return dateTimeA - dateTimeB;
-                                })
-                                .map((slot) => (
-                                    <div className="booking-card" key={slot.id}>
-                                        <h3>{slot.subject}</h3>
+                                        return dateTimeA - dateTimeB;
+                                    })
+                                    .slice(0, visibleAvailableSlots)
+                                    .map((slot) => (
+                                        <div className="booking-card" key={slot.id}>
+                                            <h3>{slot.subject}</h3>
 
-                                        <span className="available-pill">Available</span>
+                                            <span className="available-pill">Available</span>
 
-                                        <div className="booking-info">
-                                            <p><CircleUserRound size={18} /> Tutor: {slot.tutorName}</p>
-                                            <p><Calendar size={18} /> {formatDate(slot.date)}</p>
-                                            <p><Clock size={18} /> {formatTime(slot.startTime)} - {formatTime(slot.endTime)}</p>
+                                            <div className="booking-info">
+                                                <p><CircleUserRound size={18} /> Tutor: {slot.tutorName}</p>
+                                                <p><Calendar size={18} /> {formatDate(slot.date)}</p>
+                                                <p><Clock size={18} /> {formatTime(slot.startTime)} - {formatTime(slot.endTime)}</p>
+                                            </div>
+
+                                            <button
+                                                className="book-slot-button"
+                                                onClick={() => handleBookSlot(slot.id)}
+                                            >
+                                                <BookOpen size={18} />
+                                                Book This Slot
+                                            </button>
                                         </div>
+                                    ))}
 
-                                        <button
-                                            className="book-slot-button"
-                                            onClick={() => handleBookSlot(slot.id)}
-                                        >
-                                            <BookOpen size={18} />
-                                            Book This Slot
-                                        </button>
-                                    </div>
-                                ))
+                                {visibleAvailableSlots < slots.filter(isUpcomingSlot).length && (
+                                    <button
+                                        className="load-more-button"
+                                        onClick={() => setVisibleAvailableSlots(visibleAvailableSlots + 3)}
+                                    >
+                                        Load More
+                                    </button>
+                                )}
+                            </>
                         )}
                     </section>
                 )}
-
                 {activeTab === 'myLessons' && (
                     <section className="slot-list">
                         {upcomingBookings.length === 0 ? (
                             <p className="empty-state">No upcoming lessons yet.</p>
                         ) : (
-                            upcomingBookings.map((booking) => (
+                            upcomingBookings.slice(0, visibleMyLessons).map((booking) => (
+
                                 <div className="booking-card" key={booking.id}>
                                     <h3>{booking.subject}</h3>
 
@@ -246,13 +262,22 @@ function StudentDashboardPage() {
                         )}
                     </section>
                 )}
+                {visibleMyLessons < upcomingBookings.length && (
+                <button
+                    className="load-more-button"
+                    onClick={() => setVisibleMyLessons(visibleMyLessons + 3)}
+                >
+                    Load More
+                </button>
+            )}
+
 
                 {activeTab === 'past' && (
                     <section className="slot-list">
                         {pastBookings.length === 0 ? (
                             <p className="empty-state">No past lessons yet.</p>
                         ) : (
-                            pastBookings.map((booking) => (
+                            pastBookings.slice(0, visiblePastLessons).map((booking) => (
                                 <div className="booking-card" key={booking.id}>
                                     <h3>{booking.subject}</h3>
 
@@ -267,6 +292,15 @@ function StudentDashboardPage() {
                             ))
                         )}
                     </section>
+
+                )}
+                {visiblePastLessons < pastBookings.length && (
+                    <button
+                        className="load-more-button"
+                        onClick={() => setVisiblePastLessons(visiblePastLessons + 3)}
+                    >
+                        Load More
+                    </button>
                 )}
             </main>
 

@@ -8,6 +8,7 @@ import com.tutorflow.model.User;
 import com.tutorflow.repository.ILessonSlotRepository;
 import com.tutorflow.repository.IUserRepository;
 import org.springframework.stereotype.Service;
+import com.tutorflow.exception.BadRequestException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,7 +33,18 @@ public class LessonSlotService {
     ) {
 
         User tutor = userRepository.findByEmail(tutorEmail);
+        LocalDateTime slotStartDateTime = LocalDateTime.of(
+                request.getDate(),
+                request.getStartTime()
+        );
 
+        if (slotStartDateTime.isBefore(LocalDateTime.now())) {
+            throw new BadRequestException("Lesson slot cannot be created in the past");
+        }
+
+        if (!request.getEndTime().isAfter(request.getStartTime())) {
+            throw new BadRequestException("End time must be after start time");
+        }
         LessonSlot lessonSlot = new LessonSlot();
 
         lessonSlot.setSubject(request.getSubject());
