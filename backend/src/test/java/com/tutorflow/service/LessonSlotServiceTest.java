@@ -49,7 +49,7 @@ class LessonSlotServiceTest {
         CreateLessonSlotRequestDTO request = new CreateLessonSlotRequestDTO();
 
         ReflectionTestUtils.setField(request, "subject", "Mathematics");
-        ReflectionTestUtils.setField(request, "date", LocalDate.of(2026, 5, 20));
+        ReflectionTestUtils.setField(request, "date", LocalDate.now().plusDays(7));
         ReflectionTestUtils.setField(request, "startTime", LocalTime.of(14, 0));
         ReflectionTestUtils.setField(request, "endTime", LocalTime.of(15, 0));
 
@@ -72,7 +72,7 @@ class LessonSlotServiceTest {
         LessonSlot savedSlot = slotCaptor.getValue();
 
         assertEquals("Mathematics", savedSlot.getSubject());
-        assertEquals(LocalDate.of(2026, 5, 20), savedSlot.getDate());
+        assertEquals(LocalDate.now().plusDays(7), savedSlot.getDate());
         assertEquals(LocalTime.of(14, 0), savedSlot.getStartTime());
         assertEquals(LocalTime.of(15, 0), savedSlot.getEndTime());
         assertEquals(LessonSlotStatus.AVAILABLE, savedSlot.getStatus());
