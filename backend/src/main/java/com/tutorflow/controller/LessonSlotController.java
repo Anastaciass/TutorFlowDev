@@ -63,4 +63,9 @@ public class LessonSlotController {
         String tutorEmail = authentication.getName();
         return lessonSlotService.declineBooking(slotId, tutorEmail);
     }
+    @GetMapping("/student/bookings")
+    public List<LessonSlotResponseDTO> getStudentBookings(Authentication authentication) {
+        String studentEmail = authentication.getName();
+        return lessonSlotService.getStudentBookings(studentEmail);
+    }
 }

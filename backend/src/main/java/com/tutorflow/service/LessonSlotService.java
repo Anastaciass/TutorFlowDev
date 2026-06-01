@@ -126,6 +126,14 @@ public class LessonSlotService {
 
         return mapToDTO(savedSlot);
     }
+    public List<LessonSlotResponseDTO> getStudentBookings(String studentEmail) {
+        User student = userRepository.findByEmail(studentEmail);
+
+        return lessonSlotRepository.findByStudent(student)
+                .stream()
+                .map(this::mapToDTO)
+                .toList();
+    }
 
     private LessonSlotResponseDTO mapToDTO(LessonSlot slot) {
 

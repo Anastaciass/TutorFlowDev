@@ -87,3 +87,17 @@ export async function bookLessonSlot(accessToken, slotId) {
 
     return await response.json();
 }
+export async function getStudentBookings(accessToken) {
+    const response = await fetch(`${API_BASE_URL}/api/student/bookings`, {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to load student bookings');
+    }
+
+    return await response.json();
+}

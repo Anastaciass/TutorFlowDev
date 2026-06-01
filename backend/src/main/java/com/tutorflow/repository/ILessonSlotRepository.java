@@ -12,4 +12,5 @@ public interface ILessonSlotRepository extends JpaRepository<LessonSlot, Integer
     List<LessonSlot> findByStatus(LessonSlotStatus status);
 
     List<LessonSlot> findByTutor(User tutor);
+    List<LessonSlot> findByStudent(User student);
 }
