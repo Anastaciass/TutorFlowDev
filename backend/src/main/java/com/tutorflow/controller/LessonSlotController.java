@@ -37,4 +37,35 @@ public class LessonSlotController {
     public List<LessonSlotResponseDTO> getAvailableSlots() {
         return lessonSlotService.getAvailableSlots();
     }
+
+    @PostMapping("/student/slots/{slotId}/book")
+    public LessonSlotResponseDTO bookSlot(
+            @PathVariable Integer slotId,
+            Authentication authentication
+    ) {
+        String studentEmail = authentication.getName();
+        return lessonSlotService.bookSlot(slotId, studentEmail);
+    }
+    @PostMapping("/tutor/slots/{slotId}/confirm")
+    public LessonSlotResponseDTO confirmBooking(
+            @PathVariable Integer slotId,
+            Authentication authentication
+    ) {
+        String tutorEmail = authentication.getName();
+        return lessonSlotService.confirmBooking(slotId, tutorEmail);
+    }
+
+    @PostMapping("/tutor/slots/{slotId}/decline")
+    public LessonSlotResponseDTO declineBooking(
+            @PathVariable Integer slotId,
+            Authentication authentication
+    ) {
+        String tutorEmail = authentication.getName();
+        return lessonSlotService.declineBooking(slotId, tutorEmail);
+    }
+    @GetMapping("/student/bookings")
+    public List<LessonSlotResponseDTO> getStudentBookings(Authentication authentication) {
+        String studentEmail = authentication.getName();
+        return lessonSlotService.getStudentBookings(studentEmail);
+    }
 }

@@ -8,6 +8,7 @@ import com.tutorflow.model.User;
 import com.tutorflow.repository.ILessonSlotRepository;
 import com.tutorflow.repository.IUserRepository;
 import org.springframework.stereotype.Service;
+import com.tutorflow.exception.BadRequestException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,7 +33,18 @@ public class LessonSlotService {
     ) {
 
         User tutor = userRepository.findByEmail(tutorEmail);
+        LocalDateTime slotStartDateTime = LocalDateTime.of(
+                request.getDate(),
+                request.getStartTime()
+        );
 
+        if (slotStartDateTime.isBefore(LocalDateTime.now())) {
+            throw new BadRequestException("Lesson slot cannot be created in the past");
+        }
+
+        if (!request.getEndTime().isAfter(request.getStartTime())) {
+            throw new BadRequestException("End time must be after start time");
+        }
         LessonSlot lessonSlot = new LessonSlot();
 
         lessonSlot.setSubject(request.getSubject());
@@ -71,6 +83,70 @@ public class LessonSlotService {
                 .toList();
     }
 
+    public LessonSlotResponseDTO bookSlot(Integer slotId, String studentEmail) {
+        LessonSlot slot = lessonSlotRepository.findById(slotId)
+                .orElseThrow(() -> new RuntimeException("Lesson slot not found"));
+
+        if (slot.getStatus() != LessonSlotStatus.AVAILABLE) {
+            throw new RuntimeException("Lesson slot is not available");
+        }
+
+        User student = userRepository.findByEmail(studentEmail);
+
+        slot.setStudent(student);
+        slot.setStatus(LessonSlotStatus.PENDING);
+
+        LessonSlot savedSlot = lessonSlotRepository.save(slot);
+
+        return mapToDTO(savedSlot);
+    }
+    public LessonSlotResponseDTO confirmBooking(Integer slotId, String tutorEmail) {
+        LessonSlot slot = lessonSlotRepository.findById(slotId)
+                .orElseThrow(() -> new RuntimeException("Lesson slot not found"));
+
+        if (!slot.getTutor().getEmail().equals(tutorEmail)) {
+            throw new RuntimeException("You are not allowed to confirm this booking");
+        }
+
+        if (slot.getStatus() != LessonSlotStatus.PENDING) {
+            throw new RuntimeException("Lesson slot is not pending");
+        }
+
+        slot.setStatus(LessonSlotStatus.CONFIRMED);
+
+        LessonSlot savedSlot = lessonSlotRepository.save(slot);
+
+        return mapToDTO(savedSlot);
+    }
+
+    public LessonSlotResponseDTO declineBooking(Integer slotId, String tutorEmail) {
+        LessonSlot slot = lessonSlotRepository.findById(slotId)
+                .orElseThrow(() -> new RuntimeException("Lesson slot not found"));
+
+        if (!slot.getTutor().getEmail().equals(tutorEmail)) {
+            throw new RuntimeException("You are not allowed to decline this booking");
+        }
+
+        if (slot.getStatus() != LessonSlotStatus.PENDING) {
+            throw new RuntimeException("Lesson slot is not pending");
+        }
+
+        slot.setStudent(null);
+        slot.setStatus(LessonSlotStatus.AVAILABLE);
+
+        LessonSlot savedSlot = lessonSlotRepository.save(slot);
+
+        return mapToDTO(savedSlot);
+    }
+    public List<LessonSlotResponseDTO> getStudentBookings(String studentEmail) {
+        User student = userRepository.findByEmail(studentEmail);
+
+        return lessonSlotRepository.findByStudent(student)
+                .stream()
+                .map(this::mapToDTO)
+                .toList();
+    }
+
     private LessonSlotResponseDTO mapToDTO(LessonSlot slot) {
 
         return new LessonSlotResponseDTO(
@@ -84,4 +160,5 @@ public class LessonSlotService {
                 slot.getTutor().getFullName()
         );
     }
+
 }

@@ -43,6 +43,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/student/slots").hasRole("STUDENT")
                         .requestMatchers("/api/test/student").hasRole("STUDENT")
                         .requestMatchers("/api/test/tutor").hasRole("TUTOR")
+                        .requestMatchers("/api/student/slots/*/book").hasRole("STUDENT")
+                        .requestMatchers("/api/tutor/slots/*/confirm").hasRole("TUTOR")
+                        .requestMatchers("/api/tutor/slots/*/decline").hasRole("TUTOR")
+                        .requestMatchers("/api/student/bookings").hasRole("STUDENT")
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex

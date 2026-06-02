@@ -989,3 +989,48 @@ input {
   color: #64748b;
   font-size: 17px;
 }
+.book-slot-button {
+  width: 100%;
+  margin-top: 20px;
+  padding: 14px 18px;
+  border: none;
+  border-radius: 10px;
+  background-color: #2563eb;
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.book-slot-button:hover {
+  background-color: #1d4ed8;
+}
+.past-pill {
+  display: inline-block;
+  background: #e5e7eb;
+  color: #374151;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 14px;
+  margin-bottom: 18px;
+}
+.load-more-button {
+  align-self: center;
+  margin-top: 10px;
+  padding: 12px 28px;
+  border: none;
+  border-radius: 10px;
+  background: #111827;
+  color: #ffffff;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.load-more-button:hover {
+  background: #374151;
+}
