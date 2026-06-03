@@ -1,7 +1,7 @@
-const API_BASE_URL = 'http://localhost:8080/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 
 export async function registerUser(userData) {
-    const response = await fetch(`${API_BASE_URL}/auth/register`, {
+    const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -19,7 +19,7 @@ export async function registerUser(userData) {
 }
 
 export async function loginUser(userData) {
-    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -37,7 +37,7 @@ export async function loginUser(userData) {
 }
 
 export async function getCurrentUser(accessToken) {
-    const response = await fetch(`${API_BASE_URL}/users/me`, {
+    const response = await fetch(`${API_BASE_URL}/api/users/me`, {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -54,7 +54,7 @@ export async function getCurrentUser(accessToken) {
 }
 
 export async function logoutUser(refreshToken) {
-    const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+    const response = await fetch(`${API_BASE_URL}/api/auth/logout`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
