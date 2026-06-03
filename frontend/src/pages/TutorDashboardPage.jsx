@@ -259,10 +259,11 @@ function TutorDashboardPage() {
 
                 {activeTab === 'booking' && (
                     <section className="slot-list">
-                        {slots.filter((slot) => slot.status === 'PENDING').length === 0 ? (
+                        {pendingRequests.length === 0 ? (
                             <p className="empty-state">No booking requests yet.</p>
                         ) : (
-                            pendingRequests.slice(0, visibleRequests).map((slot) => (
+                            <>
+                                {pendingRequests.slice(0, visibleRequests).map((slot) => (
                                     <div className="booking-card" key={slot.id}>
                                         <h3>{slot.subject}</h3>
                                         <span className="pending-pill">Pending Approval</span>
@@ -273,66 +274,58 @@ function TutorDashboardPage() {
                                         </div>
 
                                         <div className="booking-actions">
-                                            <button
-                                                className="confirm-button"
-                                                onClick={() => handleConfirm(slot.id)}
-                                            >
+                                            <button className="confirm-button" onClick={() => handleConfirm(slot.id)}>
                                                 <CheckCircle size={18} />
                                                 Confirm
                                             </button>
 
-                                            <button
-                                                className="decline-button"
-                                                onClick={() => handleDecline(slot.id)}
-                                            >
+                                            <button className="decline-button" onClick={() => handleDecline(slot.id)}>
                                                 <X size={18} />
                                                 Decline
                                             </button>
                                         </div>
                                     </div>
-                                ))
+                                ))}
+
+                                {visibleRequests < pendingRequests.length && (
+                                    <button className="load-more-button" onClick={() => setVisibleRequests(visibleRequests + 3)}>
+                                        Load More
+                                    </button>
+                                )}
+                            </>
                         )}
                     </section>
-
-                )}
-                {visibleRequests < pendingRequests.length && (
-                    <button
-                        className="load-more-button"
-                        onClick={() => setVisibleRequests(visibleRequests + 3)}
-                    >
-                        Load More
-                    </button>
                 )}
 
                 {activeTab === 'upcoming' && (
                     <section className="slot-list">
-                        {slots.length === 0 ? (
+                        {upcomingSlots.length === 0 ? (
                             <p className="empty-state">No upcoming lesson slots yet.</p>
                         ) : (
-                            upcomingSlots.slice(0, visibleUpcomingLessons).map((slot) => (
-                                <div className="booking-card" key={slot.id}>
-                                    <h3>{slot.subject}</h3>
+                            <>
+                                {upcomingSlots.slice(0, visibleUpcomingLessons).map((slot) => (
+                                    <div className="booking-card" key={slot.id}>
+                                        <h3>{slot.subject}</h3>
 
-                                    <span className={slot.status === 'AVAILABLE' ? 'available-pill' : 'pending-pill'}>
-                        {slot.status === 'AVAILABLE' ? 'Available' : slot.status}
-                    </span>
+                                        <span className={slot.status === 'AVAILABLE' ? 'available-pill' : 'pending-pill'}>
+                            {slot.status === 'AVAILABLE' ? 'Available' : slot.status}
+                        </span>
 
-                                    <div className="booking-info">
-                                        <p><Calendar size={18} /> {formatDate(slot.date)}</p>
-                                        <p><Clock size={18} /> {formatTime(slot.startTime)} - {formatTime(slot.endTime)}</p>
+                                        <div className="booking-info">
+                                            <p><Calendar size={18} /> {formatDate(slot.date)}</p>
+                                            <p><Clock size={18} /> {formatTime(slot.startTime)} - {formatTime(slot.endTime)}</p>
+                                        </div>
                                     </div>
-                                </div>
-                            ))
+                                ))}
+
+                                {visibleUpcomingLessons < upcomingSlots.length && (
+                                    <button className="load-more-button" onClick={() => setVisibleUpcomingLessons(visibleUpcomingLessons + 3)}>
+                                        Load More
+                                    </button>
+                                )}
+                            </>
                         )}
                     </section>
-                )}
-                {visibleUpcomingLessons < upcomingSlots.length && (
-                    <button
-                        className="load-more-button"
-                        onClick={() => setVisibleUpcomingLessons(visibleUpcomingLessons + 3)}
-                    >
-                        Load More
-                    </button>
                 )}
 
                 {activeTab === 'past' && (
@@ -340,28 +333,28 @@ function TutorDashboardPage() {
                         {pastLessons.length === 0 ? (
                             <p className="empty-state">No past lessons yet.</p>
                         ) : (
-                            pastLessons.slice(0, visiblePastLessons).map((slot) => (
-                                <div className="booking-card" key={slot.id}>
-                                    <h3>{slot.subject}</h3>
+                            <>
+                                {pastLessons.slice(0, visiblePastLessons).map((slot) => (
+                                    <div className="booking-card" key={slot.id}>
+                                        <h3>{slot.subject}</h3>
 
-                                    <span className="past-pill">Completed</span>
+                                        <span className="past-pill">Completed</span>
 
-                                    <div className="booking-info">
-                                        <p><Calendar size={18} /> {formatDate(slot.date)}</p>
-                                        <p><Clock size={18} /> {formatTime(slot.startTime)} - {formatTime(slot.endTime)}</p>
+                                        <div className="booking-info">
+                                            <p><Calendar size={18} /> {formatDate(slot.date)}</p>
+                                            <p><Clock size={18} /> {formatTime(slot.startTime)} - {formatTime(slot.endTime)}</p>
+                                        </div>
                                     </div>
-                                </div>
-                            ))
+                                ))}
+
+                                {visiblePastLessons < pastLessons.length && (
+                                    <button className="load-more-button" onClick={() => setVisiblePastLessons(visiblePastLessons + 3)}>
+                                        Load More
+                                    </button>
+                                )}
+                            </>
                         )}
                     </section>
-                )}
-                {visiblePastLessons < pastLessons.length && (
-                    <button
-                        className="load-more-button"
-                        onClick={() => setVisiblePastLessons(visiblePastLessons + 3)}
-                    >
-                        Load More
-                    </button>
                 )}
             </main>
 

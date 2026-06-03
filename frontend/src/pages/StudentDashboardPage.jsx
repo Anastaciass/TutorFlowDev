@@ -243,56 +243,67 @@ function StudentDashboardPage() {
                         {upcomingBookings.length === 0 ? (
                             <p className="empty-state">No upcoming lessons yet.</p>
                         ) : (
-                            upcomingBookings.slice(0, visibleMyLessons).map((booking) => (
+                            <>
+                                {upcomingBookings.slice(0, visibleMyLessons).map((booking) => (
+                                    <div className="booking-card" key={booking.id}>
+                                        <h3>{booking.subject}</h3>
 
-                                <div className="booking-card" key={booking.id}>
-                                    <h3>{booking.subject}</h3>
+                                        <span className={booking.status === 'CONFIRMED' ? 'available-pill' : 'pending-pill'}>
+                            {booking.status === 'CONFIRMED' ? 'Confirmed' : 'Pending Approval'}
+                        </span>
 
-                                    <span className={booking.status === 'CONFIRMED' ? 'available-pill' : 'pending-pill'}>
-                        {booking.status === 'CONFIRMED' ? 'Confirmed' : 'Pending Approval'}
-                    </span>
-
-                                    <div className="booking-info">
-                                        <p><CircleUserRound size={18} /> Tutor: {booking.tutorName}</p>
-                                        <p><Calendar size={18} /> {formatDate(booking.date)}</p>
-                                        <p><Clock size={18} /> {formatTime(booking.startTime)} - {formatTime(booking.endTime)}</p>
+                                        <div className="booking-info">
+                                            <p><CircleUserRound size={18} /> Tutor: {booking.tutorName}</p>
+                                            <p><Calendar size={18} /> {formatDate(booking.date)}</p>
+                                            <p><Clock size={18} /> {formatTime(booking.startTime)} - {formatTime(booking.endTime)}</p>
+                                        </div>
                                     </div>
-                                </div>
-                            ))
+                                ))}
+
+                                {visibleMyLessons < upcomingBookings.length && (
+                                    <button
+                                        className="load-more-button"
+                                        onClick={() => setVisibleMyLessons(visibleMyLessons + 3)}
+                                    >
+                                        Load More
+                                    </button>
+                                )}
+                            </>
                         )}
                     </section>
                 )}
-                {visibleMyLessons < upcomingBookings.length && (
-                <button
-                    className="load-more-button"
-                    onClick={() => setVisibleMyLessons(visibleMyLessons + 3)}
-                >
-                    Load More
-                </button>
-            )}
-
 
                 {activeTab === 'past' && (
                     <section className="slot-list">
                         {pastBookings.length === 0 ? (
                             <p className="empty-state">No past lessons yet.</p>
                         ) : (
-                            pastBookings.slice(0, visiblePastLessons).map((booking) => (
-                                <div className="booking-card" key={booking.id}>
-                                    <h3>{booking.subject}</h3>
+                            <>
+                                {pastBookings.slice(0, visiblePastLessons).map((booking) => (
+                                    <div className="booking-card" key={booking.id}>
+                                        <h3>{booking.subject}</h3>
 
-                                    <span className="past-pill">Completed</span>
+                                        <span className="past-pill">Completed</span>
 
-                                    <div className="booking-info">
-                                        <p><CircleUserRound size={18} /> Tutor: {booking.tutorName}</p>
-                                        <p><Calendar size={18} /> {formatDate(booking.date)}</p>
-                                        <p><Clock size={18} /> {formatTime(booking.startTime)} - {formatTime(booking.endTime)}</p>
+                                        <div className="booking-info">
+                                            <p><CircleUserRound size={18} /> Tutor: {booking.tutorName}</p>
+                                            <p><Calendar size={18} /> {formatDate(booking.date)}</p>
+                                            <p><Clock size={18} /> {formatTime(booking.startTime)} - {formatTime(booking.endTime)}</p>
+                                        </div>
                                     </div>
-                                </div>
-                            ))
+                                ))}
+
+                                {visiblePastLessons < pastBookings.length && (
+                                    <button
+                                        className="load-more-button"
+                                        onClick={() => setVisiblePastLessons(visiblePastLessons + 3)}
+                                    >
+                                        Load More
+                                    </button>
+                                )}
+                            </>
                         )}
                     </section>
-
                 )}
                 {visiblePastLessons < pastBookings.length && (
                     <button
