@@ -44,3 +44,9 @@ jobs:
           tags: |
             ghcr.io/anastaciass/tutorflow-frontend:latest
             ghcr.io/anastaciass/tutorflow-frontend:${{ github.sha }}
+            
+      - name: Trigger Render backend deploy
+        run: curl -X POST "${{ secrets.RENDER_BACKEND_DEPLOY_HOOK }}"
+
+      - name: Trigger Render frontend deploy
+        run: curl -X POST "${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK }}"
