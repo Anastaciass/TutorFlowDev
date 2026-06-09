@@ -26,6 +26,7 @@ function LoginPage() {
 
             localStorage.setItem('accessToken', data.accessToken);
             localStorage.setItem('refreshToken', data.refreshToken);
+            localStorage.setItem('role', data.role);
 
             if (data.role === 'TUTOR') {
                 navigate('/tutor-dashboard');
