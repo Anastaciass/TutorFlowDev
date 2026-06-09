@@ -54,6 +54,7 @@ function LoginPage() {
                     <div className="input-with-icon">
                         <Mail size={18} className="input-icon" />
                         <input
+                            data-testid="email-input"
                             type="email"
                             placeholder="you@example.com"
                             value={email}
@@ -65,6 +66,7 @@ function LoginPage() {
                     <div className="input-with-icon">
                         <Lock size={18} className="input-icon" />
                         <input
+                            data-testid="password-input"
                             type="password"
                             placeholder="••••••••"
                             value={password}
@@ -75,7 +77,12 @@ function LoginPage() {
 
                     {errorMessage && <p className="form-error">{errorMessage}</p>}
 
-                    <button className="primary-button" type="submit" disabled={isLoading}>
+                    <button
+                        data-testid="login-button"
+                        className="primary-button"
+                        type="submit"
+                        disabled={isLoading}
+                    >
                         {isLoading ? 'Signing in...' : 'Sign In'}
                     </button>
 

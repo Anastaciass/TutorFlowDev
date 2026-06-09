@@ -6,6 +6,7 @@ import ProfilePage from './pages/ProfilePage';
 import TutorDashboardPage from './pages/TutorDashboardPage';
 import StudentDashboardPage from './pages/StudentDashboardPage';
 import './App.css';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -14,8 +15,23 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/tutor-dashboard" element={<TutorDashboardPage />} />
-          <Route path="/student-dashboard" element={<StudentDashboardPage />} />
+          <Route
+              path="/student-dashboard"
+              element={
+                  <ProtectedRoute>
+                      <StudentDashboardPage />
+                  </ProtectedRoute>
+              }
+          />
+
+          <Route
+              path="/tutor-dashboard"
+              element={
+                  <ProtectedRoute>
+                      <TutorDashboardPage />
+                  </ProtectedRoute>
+              }
+          />
       </Routes>
   );
 }
